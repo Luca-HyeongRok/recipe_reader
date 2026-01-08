@@ -1,4 +1,4 @@
-package com.example.myapplication.recipereader.feature.recipes
+package com.example.myapplication.recipereader.presentation.recipe
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,27 +7,40 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.recipereader.core.ui.EmptyState
-import com.example.myapplication.recipereader.core.ui.PermissionDenied
+import com.example.myapplication.recipereader.ui.EmptyState
+import com.example.myapplication.recipereader.ui.PermissionDenied
 
 @Composable
-fun RecipesScreen(
-    onItemClick: (String) -> Unit,
-    viewModel: RecipesViewModel = viewModel()
+fun RecipeScreen(
+    onNavigateToDetail: (String) -> Unit,
+    viewModel: RecipeViewModel = viewModel()
 ) {
-    RecipesScreenContent(
-        uiState = viewModel.uiState,
-        onItemClick = onItemClick
+    val uiState by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is RecipeUiEffect.NavigateToDetail -> onNavigateToDetail(effect.id)
+            }
+        }
+    }
+
+    RecipeScreenContent(
+        uiState = uiState,
+        onEvent = viewModel::onEvent
     )
 }
 
 @Composable
-fun RecipesScreenContent(
-    uiState: RecipesUiState,
-    onItemClick: (String) -> Unit
+fun RecipeScreenContent(
+    uiState: RecipeUiState,
+    onEvent: (RecipeUiEvent) -> Unit
 ) {
     when {
         !uiState.hasPermission -> {
@@ -39,7 +52,7 @@ fun RecipesScreenContent(
         uiState.items.isEmpty() -> {
             EmptyState(
                 title = "No recipes",
-                message = "Add recipes later."
+                message = "Load recipes from ContentProvider later."
             )
         }
         else -> {
@@ -47,7 +60,9 @@ fun RecipesScreenContent(
                 items(uiState.items) { item ->
                     ListItem(
                         headlineContent = { Text(item.title) },
-                        modifier = Modifier.clickable { onItemClick(item.id) }
+                        modifier = Modifier.clickable {
+                            onEvent(RecipeUiEvent.OnRecipeClick(item.id))
+                        }
                     )
                 }
             }
@@ -57,11 +72,11 @@ fun RecipesScreenContent(
 
 @Preview(showBackground = true)
 @Composable
-private fun RecipesScreenPreview() {
-    RecipesScreenContent(
-        uiState = RecipesUiState(
+private fun RecipeScreenPreview() {
+    RecipeScreenContent(
+        uiState = RecipeUiState(
             items = listOf(RecipeItem("1", "Preview Recipe"))
         ),
-        onItemClick = {}
+        onEvent = {}
     )
 }

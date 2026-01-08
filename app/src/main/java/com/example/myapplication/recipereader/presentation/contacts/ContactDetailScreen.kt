@@ -1,4 +1,4 @@
-package com.example.myapplication.recipereader.feature.recipes
+package com.example.myapplication.recipereader.presentation.contacts
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -10,16 +10,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RecipeDetailScreen(id: String) {
-    // TODO: Load detail via ContentProvider.
+fun ContactDetailScreen(id: String) {
+    // TODO: Query ContactsProvider for contact detail.
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "Recipe Detail", style = MaterialTheme.typography.titleLarge)
+        Text(text = "Contact Detail", style = MaterialTheme.typography.titleLarge)
         Text(text = "id = $id", style = MaterialTheme.typography.bodyMedium)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun RecipeDetailScreenPreview() {
-    RecipeDetailScreen(id = "1")
+private fun ContactDetailScreenPreview() {
+    ContactDetailScreen(id = "1")
 }

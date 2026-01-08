@@ -1,4 +1,4 @@
-package com.example.myapplication.recipereader.feature.gallery
+package com.example.myapplication.recipereader.presentation.gallery
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -11,7 +11,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PhotoDetailScreen(id: String) {
-    // TODO: Load detail from MediaStore.
+    // TODO: Load photo detail from MediaStore.
+    // TODO: Display EXIF info in detail screen.
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = "Photo Detail", style = MaterialTheme.typography.titleLarge)
         Text(text = "id = $id", style = MaterialTheme.typography.bodyMedium)

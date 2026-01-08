@@ -1,4 +1,4 @@
-package com.example.myapplication.recipereader.core.ui
+package com.example.myapplication.recipereader.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
