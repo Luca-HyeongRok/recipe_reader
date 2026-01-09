@@ -1,8 +1,12 @@
 package com.example.myapplication.recipereader.data.datasource
 
+import android.util.Log
 import com.example.myapplication.recipereader.domain.model.Contact
 
 class ContactsMockDataSource {
+    private companion object {
+        private const val TAG = "ContactsMockDataSource"
+    }
 
     fun getContacts(): List<Contact> = listOf(
         Contact(id = "1", name = "김민지", phoneNumber = "010-1234-5678", isFavorite = false),
@@ -17,5 +21,5 @@ class ContactsMockDataSource {
         Contact(id = "10", name = "강다은", phoneNumber = "010-0123-4567", isFavorite = false),
         Contact(id = "11", name = "배서준", phoneNumber = "010-1122-3344", isFavorite = false),
         Contact(id = "12", name = "조유진", phoneNumber = "010-2233-4455", isFavorite = false)
-    )
+    ).also { Log.d(TAG, "Loaded mock contacts=${it.size}") }
 }

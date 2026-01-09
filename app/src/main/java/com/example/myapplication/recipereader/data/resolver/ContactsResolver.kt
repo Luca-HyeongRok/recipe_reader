@@ -2,11 +2,16 @@ package com.example.myapplication.recipereader.data.resolver
 
 import android.content.ContentResolver
 import android.provider.ContactsContract
+import android.util.Log
 import com.example.myapplication.recipereader.domain.model.Contact
 
 class ContactsResolver(
     private val contentResolver: ContentResolver
 ) {
+    private companion object {
+        private const val TAG = "ContactsResolver"
+    }
+
     fun getContacts(): List<Contact> {
         val projection = arrayOf(
             ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
@@ -23,6 +28,7 @@ class ContactsResolver(
                 "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY} ASC"
             )
         } catch (e: Exception) {
+            Log.e(TAG, "Query failed", e)
             null
         } ?: return emptyList()
 
@@ -49,6 +55,7 @@ class ContactsResolver(
                 }
             }
         }
+        Log.d(TAG, "Loaded contacts=${contacts.size}")
         return contacts.values.toList()
     }
 }

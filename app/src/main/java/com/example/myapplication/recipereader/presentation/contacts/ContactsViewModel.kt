@@ -1,5 +1,6 @@
 package com.example.myapplication.recipereader.presentation.contacts
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.recipereader.data.repository.ContactsRepository
@@ -12,11 +13,16 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ContactsViewModel(
     private val repository: ContactsRepository
 ) : ViewModel() {
+    private companion object {
+        private const val TAG = "ContactsViewModel"
+    }
+
     private val _state = MutableStateFlow(ContactsUiState())
     val state: StateFlow<ContactsUiState> = _state.asStateFlow()
 
@@ -25,11 +31,25 @@ class ContactsViewModel(
 
     private var allContacts: List<Contact> = emptyList()
 
+    init {
+        loadContacts()
+    }
+
     fun onEvent(event: ContactsUiEvent) {
         when (event) {
             ContactsUiEvent.LoadContacts -> loadContacts()
             is ContactsUiEvent.OnSearchQueryChange -> {
-                val filtered = filterContacts(allContacts, event.query)
+                val queryText = event.query.text
+                val shouldFilter = event.query.composition == null
+                val filtered = if (shouldFilter) {
+                    filterContacts(allContacts, queryText)
+                } else {
+                    _state.value.items
+                }
+                Log.d(
+                    TAG,
+                    "Search query='${queryText}' composing=${!shouldFilter} results=${filtered.size}"
+                )
                 _state.value = _state.value.copy(
                     searchQuery = event.query,
                     items = filtered
@@ -50,12 +70,15 @@ class ContactsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.loadContacts()
             allContacts = result.contacts
-            val filtered = filterContacts(allContacts, _state.value.searchQuery)
-            _state.value = _state.value.copy(
-                hasPermission = result.hasPermission,
-                isUsingMock = result.isUsingMock,
-                items = filtered
-            )
+            Log.d(TAG, "Loaded contacts=${allContacts.size} usingMock=${result.isUsingMock}")
+            _state.update { current ->
+                val filtered = filterContacts(allContacts, current.searchQuery.text)
+                current.copy(
+                    hasPermission = result.hasPermission,
+                    isUsingMock = result.isUsingMock,
+                    items = filtered
+                )
+            }
         }
     }
 
@@ -65,8 +88,10 @@ class ContactsViewModel(
             allContacts = allContacts.map { contact ->
                 if (contact.id == contactId) contact.copy(isFavorite = isFavorite) else contact
             }
-            val filtered = filterContacts(allContacts, _state.value.searchQuery)
-            _state.value = _state.value.copy(items = filtered)
+            _state.update { current ->
+                val filtered = filterContacts(allContacts, current.searchQuery.text)
+                current.copy(items = filtered)
+            }
         }
     }
 
