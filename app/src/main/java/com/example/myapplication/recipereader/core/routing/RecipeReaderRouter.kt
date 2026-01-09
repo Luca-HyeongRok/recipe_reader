@@ -20,11 +20,7 @@ fun RecipeReaderRouter(navController: NavHostController) {
         startDestination = Route.Recipes.route
     ) {
         composable(Route.Recipes.route) {
-            RecipeScreen(
-                onNavigateToDetail = { id ->
-                    navController.navigate(Route.RecipeDetail.createRoute(id))
-                }
-            )
+            RecipeScreen(onRecipeClick = { })
         }
         composable(Route.Contacts.route) {
             ContactsScreen(

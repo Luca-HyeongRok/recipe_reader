@@ -1,19 +1,14 @@
 package com.example.myapplication.recipereader.presentation.recipe
 
-data class RecipeItem(
-    val id: String,
-    val title: String
-)
+import com.example.myapplication.recipereader.domain.model.Recipe
 
 data class RecipeUiState(
-    val hasPermission: Boolean = true,
-    val items: List<RecipeItem> = emptyList()
+    val isLoading: Boolean = false,
+    val recipes: List<Recipe> = emptyList(),
+    val error: String? = null
 )
 
 sealed interface RecipeUiEvent {
-    data class OnRecipeClick(val id: String) : RecipeUiEvent
-}
-
-sealed interface RecipeUiEffect {
-    data class NavigateToDetail(val id: String) : RecipeUiEffect
+    data object LoadRecipes : RecipeUiEvent
+    data class OnRecipeClick(val recipeId: Int) : RecipeUiEvent
 }
